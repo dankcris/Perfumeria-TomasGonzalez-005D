@@ -35,16 +35,16 @@ Sistema de gestión para una perfumería desarrollado con **arquitectura de micr
 
 | Microservicio | Puerto | Base de datos | Descripción |
 |---|---|---|---|
-| `autenticacionservice` | 8080 | `db_autenticacion` | Autenticación JWT y gestión de usuarios |
+| `autenticacionservice` | 8086 | `db_autenticacion` | Autenticación JWT y gestión de usuarios |
 | `clientesservice` | 8081 | `basecliente` | Gestión de clientes |
 | `inventarioservice` | 8082 | `db_inventario` | Control de inventario |
 | `perfumesservice` | 8083 | `db_perfumes` | Catálogo de perfumes |
 | `proveedoresservice` | 8084 | `db_proveedores` | Gestión de proveedores |
 | `ventasservice` | 8085 | `db_ventas` | Registro de ventas |
-| `pagosservice` | 8086 | `db_pagos` | Gestión de pagos |
-| `enviosservice` | 8087 | `db_envios` | Gestión de envíos |
-| `categoriasservice` | 8088 | `db_categorias` | Categorías de productos |
-| `promocionesservice` | 8089 | `db_promociones` | Promociones y descuentos |
+| `categoriasservice` | 8087 | `db_categorias` | Categorías de productos |
+| `promocionesservice` | 8088 | `db_promociones` | Promociones y descuentos |
+| `pagosservice` | 8089 | `db_pagos` | Gestión de pagos |
+| `enviosservice` | 8090 | `db_envios` | Gestión de envíos |
 | `apigateway` | 9090 | - | Puerta de entrada centralizada |
 
 ---
@@ -64,9 +64,7 @@ cd Perfumeria-TomasGonzalez-005D
 
 ### 3. Importar la base de datos
 En phpMyAdmin, importar el archivo:
-```
 Perfumeria/database/perfumeria_database.sql
-```
 
 ### 4. Ejecutar los microservicios
 
@@ -122,21 +120,15 @@ cd Perfumeria/promocionesservice
 ##  Autenticación
 
 Todos los endpoints (excepto login y register) requieren un token JWT en el header:
-
-```
 Authorization: Bearer <token>
-```
 
 ### Obtener token
-```
 POST http://localhost:9090/api/auth/login
 Content-Type: application/json
-
 {
-  "username": "admin",
-  "password": "1234"
+"username": "admin",
+"password": "1234"
 }
-```
 
 ---
 
@@ -232,18 +224,26 @@ Todos los endpoints son accesibles a través del Gateway en `http://localhost:90
 
 ##  Swagger UI
 
-Cada microservicio expone su documentación en:
+Documentación centralizada de todos los microservicios a través del API Gateway:
+
+**http://localhost:9090/webjars/swagger-ui/index.html**
+
+Desde ahí puedes seleccionar cualquier microservicio en el dropdown superior.
+
+También accesible individualmente por cada microservicio:
 
 | Microservicio | URL Swagger |
 |---|---|
-| autenticacionservice | http://localhost:8080/swagger-ui.html |
+| autenticacionservice | http://localhost:8086/swagger-ui.html |
 | clientesservice | http://localhost:8081/swagger-ui.html |
+| inventarioservice | http://localhost:8082/swagger-ui.html |
 | perfumesservice | http://localhost:8083/swagger-ui.html |
+| proveedoresservice | http://localhost:8084/swagger-ui.html |
 | ventasservice | http://localhost:8085/swagger-ui.html |
-| pagosservice | http://localhost:8086/swagger-ui.html |
-| enviosservice | http://localhost:8087/swagger-ui.html |
-| categoriasservice | http://localhost:8088/swagger-ui.html |
-| promocionesservice | http://localhost:8089/swagger-ui.html |
+| categoriasservice | http://localhost:8087/swagger-ui.html |
+| promocionesservice | http://localhost:8088/swagger-ui.html |
+| pagosservice | http://localhost:8089/swagger-ui.html |
+| enviosservice | http://localhost:8090/swagger-ui.html |
 
 ---
 
@@ -309,6 +309,14 @@ Authorization: Bearer <token>
 El total se calcula automáticamente: `precio × cantidad`
 
 ---
+
+##  Comunicación entre microservicios
+
+- **ventasservice** consulta a **clientesservice** (puerto 8081) para verificar que el cliente exista
+- **ventasservice** consulta a **perfumesservice** (puerto 8083) para obtener el precio y calcular el total
+- **pagosservice** consulta a **ventasservice** (puerto 8085) para verificar la venta
+- **enviosservice** consulta a **ventasservice** (puerto 8085) para verificar la venta
+- El **apigateway** (puerto 9090) centraliza el acceso y valida el token JWT en cada petición
 
 ##  Comunicación entre microservicios
 
