@@ -15,7 +15,7 @@ public class SecurityConfig {
         http.csrf(c->c.disable()).sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(new RequestHeaderAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html").permitAll()
+                .requestMatchers("/v3/api-docs/**","/api/v1/inventario/v3/api-docs","/swagger-ui/**","/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/inventario/**").hasAnyRole("ADMIN","VENDEDOR")
                 .requestMatchers(HttpMethod.POST, "/api/inventario/**").hasAnyRole("ADMIN","VENDEDOR")
                 .requestMatchers(HttpMethod.PUT, "/api/inventario/**").hasAnyRole("ADMIN","VENDEDOR")
